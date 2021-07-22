@@ -1,4 +1,4 @@
-{% extends "learning_logs/base.htmls" %}
+{% extends "learning_logs/base.html" %}
 
 {% block content%}
 
@@ -7,7 +7,7 @@
         {{ form.as_p }}
 
         <button name="submit">Register</button>
-        <input type="hidden" name="next" value="{% url 'learning_log:index' %}">
+        <input type="hidden" name="next" value="{% url 'learning_logs:index' %}">
     </form>
 
 {% endblock content%}
