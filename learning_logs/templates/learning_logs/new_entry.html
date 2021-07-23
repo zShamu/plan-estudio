@@ -3,11 +3,11 @@
 {% block content %}
     <p><a href="{% url 'learning_logs:topic' topic.id %}">{{ topic }}</a></p>
 
-    <p>Add a new entry:</p>
+    <p>Agregar nueva entrada: </p>
     <form action="{% url 'learning_logs:new_entry' topic.id %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Add entry</button>
+        <button type="submit">Agregar entrada</button>
     </form>
     
 {% endblock content %}

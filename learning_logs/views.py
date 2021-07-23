@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.db.models import Q
 
 from .models import Topic, Entry
 from .forms import TopicForm, EntryForm
@@ -11,25 +12,35 @@ def index(request):
     """The home page for Learning Log."""
     return render(request, 'learning_logs/index.html')
 
-@login_required
+def _get_topics_for_user(user):
+    """Returns a Queryset of topics the user can access"""
+    q = Q(private=False)
+    if user.is_authenticated:
+        # Adds user´s own private topics to the query
+        q = q | Q(private=True, owner=user)
+
+    return Topic.objects.filter(q)
+
 def topics(request):
-    """Show all topics"""
-    topics = Topic.objects.filter(owner = request.user).order_by('date_added')
+    """Show all of the user topics"""
+    topics = _get_topics_for_user(request.user).order_by('date_added')
     context = {'topics': topics}
     return render(request, 'learning_logs/topics.html', context)
 
-@login_required
 def topic(request, topic_id):
     """Show a single topic and all its entries"""
-    topic = get_object_or_404(Topic, id=topic_id)
-
-    # Make sure the topic belong to the current user
-    if topic.owner != request.user:
-        raise Http404
-
+    topics = _get_topics_for_user(request.user)
+    
+    topic = get_object_or_404(topics, id=topic_id)
     entries = topic.entry_set.order_by('-date_added')
     context = {'topic' : topic, 'entries' : entries}
     return render(request, 'learning_logs/topic.html', context)
+
+@login_required
+def my_topics(request):
+    topics = Topic.objects.filter(owner=request.user).order_by('date_added')
+    context = {'topics': topics}
+    return render(request, 'learning_logs/my_topics.html', context)
 
 @login_required
 def new_topic(request):
@@ -42,6 +53,7 @@ def new_topic(request):
         form = TopicForm(data = request.POST)
         if form.is_valid():
             new_topic = form.save(commit = False)
+            new_topic.private = False
             new_topic.owner = request.user
             new_topic.save()
             return redirect('learning_logs:topics')

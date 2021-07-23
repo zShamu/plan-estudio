@@ -8,8 +8,10 @@ app_name = 'learning_logs'
 urlpatterns = [
     # Home page
     path('', views.index, name = 'index'),
-    # Page that shows all topics
+    # Page that show all public topics
     path('topics/', views.topics, name = 'topics'),
+    # Page that shows user topics
+    path('my_topics/', views.my_topics, name = 'my_topics'),
     # Detail page for a single topic
     path('topics/<int:topic_id>/', views.topic, name = 'topic'),
     # Page for adding a new topic
