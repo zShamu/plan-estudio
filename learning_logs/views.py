@@ -21,12 +21,6 @@ def _get_topics_for_user(user):
 
     return Topic.objects.filter(q)
 
-def topics(request):
-    """Show all of the user topics"""
-    topics = _get_topics_for_user(request.user).order_by('date_added')
-    context = {'topics': topics}
-    return render(request, 'learning_logs/topics.html', context)
-
 def topic(request, topic_id):
     """Show a single topic and all its entries"""
     topics = _get_topics_for_user(request.user)
@@ -35,6 +29,13 @@ def topic(request, topic_id):
     entries = topic.entry_set.order_by('-date_added')
     context = {'topic' : topic, 'entries' : entries}
     return render(request, 'learning_logs/topic.html', context)
+    
+def topics(request):
+    """Show all of the user topics"""
+    topics = _get_topics_for_user(request.user).order_by('date_added')
+    context = {'topics': topics}
+    return render(request, 'learning_logs/topics.html', context)
+
 
 @login_required
 def my_topics(request):
@@ -64,7 +65,7 @@ def new_topic(request):
 
 @login_required
 def new_entry(request, topic_id):
-    """Add a new entry for a particular topic"""
+    """Add a new entry to a particular topic"""
     topic = get_object_or_404(Topic, id=topic_id)
 
     if request.method != 'POST':
